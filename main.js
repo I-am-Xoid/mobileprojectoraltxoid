@@ -1,215 +1,84 @@
-const { app, BrowserWindow, ipcMain, Menu } = require('electron');
-const path = require('path');
+const express = require('express');
+const http = require('http');
 const WebSocket = require('ws');
+const path = require('path');
 
-let mainWindow;
-let signalServer;
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
-function createWindow() {
-    mainWindow = new BrowserWindow({
-        width: 1200,
-        height: 800,
-        webPreferences: {
-            nodeIntegration: false,
-            contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js'),
-            webSecurity: false // Allow local file access for development
-        },
-        icon: path.join(__dirname, 'assets', 'icon.png'),
-        title: 'Phone Screen Mirror',
-        show: false
-    });
+// Serve static files
+app.use(express.static(path.join(__dirname)));
 
-    // Load the main interface
-    mainWindow.loadFile('desktop.html');
+// Routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
 
-    // Show window when ready
-    mainWindow.once('ready-to-show', () => {
-        mainWindow.show();
-    });
+app.get('/mobile', (req, res) => {
+    res.sendFile(path.join(__dirname, 'mobile-app.html'));
+});
 
-    // Handle window closed
-    mainWindow.on('closed', () => {
-        mainWindow = null;
-        if (signalServer) {
-            signalServer.close();
-        }
-    });
+app.get('/desktop', (req, res) => {
+    res.sendFile(path.join(__dirname, 'web-desktop.html'));
+});
 
-    // Create menu
-    createMenu();
-}
+// WebSocket signaling server
+const connections = new Map();
 
-function createMenu() {
-    const template = [
-        {
-            label: 'File',
-            submenu: [
-                {
-                    label: 'New Connection',
-                    accelerator: 'CmdOrCtrl+N',
-                    click: () => {
-                        mainWindow.webContents.send('new-connection');
-                    }
-                },
-                {
-                    label: 'Disconnect',
-                    accelerator: 'CmdOrCtrl+D',
-                    click: () => {
-                        mainWindow.webContents.send('disconnect');
-                    }
-                },
-                { type: 'separator' },
-                {
-                    label: 'Exit',
-                    accelerator: process.platform === 'darwin' ? 'Cmd+Q' : 'Ctrl+Q',
-                    click: () => {
-                        app.quit();
-                    }
-                }
-            ]
-        },
-        {
-            label: 'View',
-            submenu: [
-                {
-                    label: 'Toggle Fullscreen',
-                    accelerator: 'F11',
-                    click: () => {
-                        mainWindow.setFullScreen(!mainWindow.isFullScreen());
-                    }
-                },
-                {
-                    label: 'Toggle Developer Tools',
-                    accelerator: process.platform === 'darwin' ? 'Alt+Cmd+I' : 'Ctrl+Shift+I',
-                    click: () => {
-                        mainWindow.webContents.toggleDevTools();
-                    }
-                }
-            ]
-        },
-        {
-            label: 'Help',
-            submenu: [
-                {
-                    label: 'About',
-                    click: () => {
-                        mainWindow.webContents.send('show-about');
-                    }
-                }
-            ]
-        }
-    ];
-
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
-}
-
-function startSignalServer() {
-    const port = 8080;
-    signalServer = new WebSocket.Server({ port });
+wss.on('connection', (ws) => {
+    console.log('New WebSocket connection');
     
-    const connections = new Map();
-    
-    signalServer.on('connection', (ws) => {
-        console.log('New WebSocket connection');
-        
-        ws.on('message', (data) => {
-            try {
-                const message = JSON.parse(data);
-                
-                if (message.type === 'register') {
-                    connections.set(message.code, ws);
-                    ws.code = message.code;
-                    console.log(`Registered connection with code: ${message.code}`);
-                } else if (message.type === 'signal') {
-                    const targetWs = connections.get(message.targetCode);
-                    if (targetWs && targetWs.readyState === WebSocket.OPEN) {
-                        targetWs.send(JSON.stringify(message.data));
-                    }
-                } else if (message.type === 'touch-event') {
-                    // Forward touch events to mobile device
-                    const targetWs = connections.get(message.targetCode);
-                    if (targetWs && targetWs.readyState === WebSocket.OPEN) {
-                        targetWs.send(JSON.stringify({
-                            type: 'touch-event',
-                            event: message.event
-                        }));
-                    }
+    ws.on('message', (data) => {
+        try {
+            const message = JSON.parse(data);
+            
+            if (message.type === 'register') {
+                connections.set(message.code, ws);
+                ws.code = message.code;
+                console.log(`Registered connection with code: ${message.code}`);
+            } else if (message.type === 'signal') {
+                const targetWs = connections.get(message.targetCode);
+                if (targetWs && targetWs.readyState === WebSocket.OPEN) {
+                    targetWs.send(JSON.stringify(message.data));
                 }
-            } catch (error) {
-                console.error('Error processing message:', error);
+            } else if (message.type === 'touch-event') {
+                // Forward touch events to mobile device
+                const targetWs = connections.get(message.targetCode);
+                if (targetWs && targetWs.readyState === WebSocket.OPEN) {
+                    targetWs.send(JSON.stringify({
+                        type: 'touch-event',
+                        event: message.event
+                    }));
+                }
+            } else if (message.type === 'hardware-button') {
+                // Forward hardware button events
+                const targetWs = connections.get(message.targetCode);
+                if (targetWs && targetWs.readyState === WebSocket.OPEN) {
+                    targetWs.send(JSON.stringify({
+                        type: 'hardware-button',
+                        button: message.button
+                    }));
+                }
             }
-        });
-        
-        ws.on('close', () => {
-            if (ws.code) {
-                connections.delete(ws.code);
-                console.log(`Connection ${ws.code} closed`);
-            }
-        });
-    });
-    
-    console.log(`Signal server started on port ${port}`);
-    return port;
-}
-
-// App event handlers
-app.whenReady().then(() => {
-    const signalPort = startSignalServer();
-    createWindow();
-    
-    // Send signal server port to renderer
-    mainWindow.webContents.once('dom-ready', () => {
-        mainWindow.webContents.send('signal-server-ready', signalPort);
-    });
-});
-
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') {
-        app.quit();
-    }
-});
-
-app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) {
-        createWindow();
-    }
-});
-
-// IPC handlers
-ipcMain.handle('get-app-version', () => {
-    return app.getVersion();
-});
-
-ipcMain.handle('show-mobile-qr', () => {
-    // Create a new window for mobile QR code
-    const qrWindow = new BrowserWindow({
-        width: 400,
-        height: 500,
-        parent: mainWindow,
-        modal: true,
-        webPreferences: {
-            nodeIntegration: false,
-            contextIsolation: true,
-            preload: path.join(__dirname, 'preload.js')
+        } catch (error) {
+            console.error('Error processing message:', error);
         }
     });
     
-    qrWindow.loadFile('mobile-qr.html');
-    return true;
+    ws.on('close', () => {
+        if (ws.code) {
+            connections.delete(ws.code);
+            console.log(`Connection ${ws.code} closed`);
+        }
+    });
 });
 
-ipcMain.on('forward-touch-event', (event, touchData) => {
-    // Forward touch events through WebSocket
-    if (signalServer) {
-        signalServer.clients.forEach(client => {
-            if (client.readyState === WebSocket.OPEN) {
-                client.send(JSON.stringify({
-                    type: 'touch-event',
-                    event: touchData
-                }));
-            }
-        });
-    }
+const PORT = process.env.PORT || 3000;
+
+server.listen(PORT, () => {
+    console.log(`🚀 Phone Screen Mirror Server Running on port ${PORT}!`);
+    console.log(`📱 Desktop Interface: http://localhost:${PORT}/desktop`);
+    console.log(`📱 Mobile Interface: http://localhost:${PORT}/mobile`);
+    console.log(`📱 Main Page: http://localhost:${PORT}`);
 });

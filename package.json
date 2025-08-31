@@ -2,11 +2,11 @@
   "name": "phone-screen-mirror",
   "version": "1.0.0",
   "description": "A desktop application that allows you to mirror your phone screen to your PC with touch interaction",
-  "main": "server-main.js",
+  "main": "main.js",
   "scripts": {
-    "start": "node server-main.js",
-    "dev": "node server-main.js",
-    "electron": "electron main.js",
+    "start": "node main.js",
+    "dev": "node main.js",
+    "electron": "electron electron-main.js",
     "build": "electron-builder",
     "dist": "electron-builder --publish=never"
   },
