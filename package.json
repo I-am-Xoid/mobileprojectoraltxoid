@@ -1,0 +1,56 @@
+{
+  "name": "phone-screen-mirror",
+  "version": "1.0.0",
+  "description": "A desktop application that allows you to mirror your phone screen to your PC with touch interaction",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "dist": "electron-builder --publish=never"
+  },
+  "keywords": [
+    "screen-mirror",
+    "webrtc",
+    "phone",
+    "pc",
+    "streaming",
+    "touch",
+    "electron"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "electron": "^27.0.0",
+    "ws": "^8.14.0"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.6.0"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "build": {
+    "appId": "com.phonescreen.mirror",
+    "productName": "Phone Screen Mirror",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "**/*",
+      "!dist/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "assets/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "assets/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.png"
+    }
+  }
+}

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Screen Mirror - Mobile Sender</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container mobile">
+        <header>
+            <h1>📱 Phone Screen Mirror</h1>
+            <p>Mobile Sender</p>
+        </header>
+
+        <div class="connection-panel">
+            <div class="connection-input">
+                <h2>Enter Connection Code</h2>
+                <input type="text" id="codeInput" placeholder="Enter 6-digit code" maxlength="6" class="code-input">
+                <button id="connectBtn" class="btn btn-primary">🔗 Connect</button>
+            </div>
+            
+            <div class="status">
+                <div id="status" class="status-indicator disconnected">Not connected</div>
+                <div id="connectionInfo" class="device-info"></div>
+            </div>
+        </div>
+
+        <div class="share-panel" id="sharePanel" style="display: none;">
+            <h3>Start Screen Sharing</h3>
+            <p>Tap the button below to share your screen with the PC</p>
+            <button id="shareBtn" class="btn btn-success">📺 Share Screen</button>
+        </div>
+
+        <div class="controls">
+            <button id="stopBtn" class="btn btn-danger" disabled>⏹️ Stop Sharing</button>
+            <button id="disconnectBtn" class="btn btn-secondary" disabled>❌ Disconnect</button>
+        </div>
+
+        <div class="preview-container">
+            <video id="localVideo" autoplay playsinline muted style="display: none;"></video>
+            <div id="previewPlaceholder" class="placeholder">
+                <div class="placeholder-content">
+                    <h3>📺 Screen sharing preview</h3>
+                    <p>Your screen preview will appear here when sharing starts</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions mobile-instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Get the connection code from your PC</li>
+                <li>Enter the code above and tap Connect</li>
+                <li>Tap "Share Screen" and select your screen</li>
+                <li>Your screen will be mirrored to the PC!</li>
+            </ol>
+            
+            <div class="note">
+                <strong>Note:</strong> You may need to allow screen recording permissions in your browser settings.
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Initialize mobile sender
+        const app = new ScreenMirrorApp('sender');
+    </script>
+</body>
+</html>
