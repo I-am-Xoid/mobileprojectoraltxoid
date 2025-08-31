@@ -3,59 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Phone Screen Mirror - PC Receiver</title>
+    <title>Phone Screen Mirror</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>📱 Phone Screen Mirror</h1>
-            <p>PC Receiver</p>
+            <p>Choose your interface</p>
         </header>
 
-        <div class="connection-panel">
-            <div class="connection-code">
-                <h2>Connection Code</h2>
-                <div id="connectionCode" class="code-display">Generating...</div>
-                <button id="refreshCode" class="btn btn-secondary">🔄 New Code</button>
+        <div class="interface-selection">
+            <div class="interface-card">
+                <h2>🖥️ Desktop Interface</h2>
+                <p>Control and view your phone screen from your computer</p>
+                <a href="/desktop" class="btn btn-primary">Open Desktop Interface</a>
             </div>
             
-            <div class="status">
-                <div id="status" class="status-indicator disconnected">Waiting for connection</div>
-                <div id="deviceInfo" class="device-info"></div>
+            <div class="interface-card">
+                <h2>📱 Mobile Interface</h2>
+                <p>Share your phone screen with a computer</p>
+                <a href="/mobile" class="btn btn-success">Open Mobile Interface</a>
             </div>
-        </div>
-
-        <div class="video-container">
-            <video id="remoteVideo" autoplay playsinline muted></video>
-            <div id="placeholder" class="placeholder">
-                <div class="placeholder-content">
-                    <h3>📱 Waiting for phone connection...</h3>
-                    <p>Open the mobile page on your phone and enter the connection code above</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="controls">
-            <button id="fullscreenBtn" class="btn btn-primary" disabled>🔍 Fullscreen</button>
-            <button id="disconnectBtn" class="btn btn-danger" disabled>❌ Disconnect</button>
         </div>
 
         <div class="instructions">
-            <h3>How to connect:</h3>
+            <h3>How it works:</h3>
             <ol>
-                <li>Open <strong>mobile.html</strong> on your phone's browser</li>
-                <li>Enter the connection code shown above</li>
-                <li>Grant screen sharing permissions on your phone</li>
-                <li>Your phone screen will appear here!</li>
+                <li><strong>Desktop:</strong> Open the desktop interface on your computer to receive and control</li>
+                <li><strong>Mobile:</strong> Open the mobile interface on your phone to share your screen</li>
+                <li><strong>Connect:</strong> Use the 6-digit code to connect both devices</li>
+                <li><strong>Interact:</strong> Click and drag on the desktop to control your phone!</li>
             </ol>
+            
+            <div class="features">
+                <h3>Features:</h3>
+                <ul>
+                    <li>✅ Real-time screen mirroring</li>
+                    <li>✅ Touch interaction (click & drag)</li>
+                    <li>✅ Hardware button simulation</li>
+                    <li>✅ Fullscreen mode</li>
+                    <li>✅ Works on any modern browser</li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
-    <script>
-        // Initialize PC receiver
-        const app = new ScreenMirrorApp('receiver');
-    </script>
+    <style>
+        .interface-selection {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .interface-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease;
+        }
+        
+        .interface-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .interface-card h2 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 1.5rem;
+        }
+        
+        .interface-card p {
+            margin-bottom: 25px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .features {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .features h3 {
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .features ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        .features li {
+            margin-bottom: 8px;
+            color: rgba(255,255,255,0.9);
+        }
+        
+        @media (max-width: 768px) {
+            .interface-selection {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
 </body>
 </html>
