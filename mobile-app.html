@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Screen Mirror - Mobile</title>
+    <link rel="stylesheet" href="mobile-style.css">
+</head>
+<body>
+    <div class="mobile-container">
+        <header class="mobile-header">
+            <h1>📱 Screen Mirror</h1>
+            <div id="connectionStatus" class="status-badge disconnected">Not Connected</div>
+        </header>
+
+        <div class="connection-section" id="connectionSection">
+            <div class="connection-input">
+                <h2>Enter Connection Code</h2>
+                <input type="text" id="codeInput" placeholder="Enter 6-digit code" maxlength="6" class="code-input">
+                <button id="connectBtn" class="btn btn-primary">🔗 Connect to PC</button>
+            </div>
+        </div>
+
+        <div class="share-section" id="shareSection" style="display: none;">
+            <div class="share-controls">
+                <h2>Screen Sharing</h2>
+                <p>Share your screen with the connected PC</p>
+                <button id="shareBtn" class="btn btn-success">📺 Start Sharing</button>
+                <button id="stopBtn" class="btn btn-danger" style="display: none;">⏹️ Stop Sharing</button>
+            </div>
+            
+            <div class="touch-receiver" id="touchReceiver" style="display: none;">
+                <h3>Touch Events</h3>
+                <div class="touch-indicator-area">
+                    <div id="touchIndicator" class="touch-dot"></div>
+                    <div id="touchInfo" class="touch-info">Waiting for touch events...</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="preview-section">
+            <video id="localVideo" autoplay playsinline muted style="display: none;"></video>
+            <div id="previewPlaceholder" class="placeholder">
+                <div class="placeholder-content">
+                    <div class="placeholder-icon">📺</div>
+                    <h3>Screen Preview</h3>
+                    <p>Your screen will appear here when sharing</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls-section">
+            <button id="disconnectBtn" class="btn btn-secondary" disabled>❌ Disconnect</button>
+        </div>
+
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ol>
+                <li>Get the 6-digit code from your PC app</li>
+                <li>Enter the code and tap Connect</li>
+                <li>Tap "Start Sharing" and select your screen</li>
+                <li>Your PC can now control your phone screen!</li>
+            </ol>
+            
+            <div class="note">
+                <strong>Note:</strong> Make sure both devices are on the same network.
+            </div>
+        </div>
+    </div>
+
+    <script src="mobile-app.js"></script>
+</body>
+</html>
